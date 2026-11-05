@@ -1,0 +1,37 @@
+{% extends "paiements/base.html" %}
+{% block titre %}Liste des paiements{% endblock %}
+{% block contenu %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h4 mb-0">Liste des paiements</h1>
+  <span class="badge text-bg-primary fs-6">{{ paiements|length }} paiement{{ paiements|length|pluralize }} – {{ total|floatformat:2 }} €</span>
+</div>
+
+<div class="card carte p-3">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Compte</th><th>Service</th><th class="text-end">Montant</th><th></th></tr></thead>
+      <tbody>
+      {% for p in paiements %}
+        <tr>
+          <td>{{ p.numero }}</td>
+          <td class="text-nowrap">{{ p.date|date:"d/m/Y H:i" }}</td>
+          <td>{{ p.compte.proprietaire.email|default:p.compte.proprietaire.username }}</td>
+          <td>{{ p.compte.numero }}</td>
+          <td>{{ p.service }}</td>
+          <td class="text-end text-nowrap">{{ p.montant|floatformat:2 }} €</td>
+          <td class="text-end">
+            <form method="post" action="{% url 'supprimer_paiement' p.pk %}"
+                  onsubmit="return confirm('Supprimer le paiement n°{{ p.numero }} et rembourser le compte ?');">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger text-nowrap"><i class="bi bi-trash"></i> Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-muted text-center">Aucun paiement.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -126,3 +126,8 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+# --- SPL ---
+AUTH_USER_MODEL = "paiements.Utilisateur"
+LOGIN_URL = "connexion"
+LOGIN_REDIRECT_URL = "accueil"
+LOGOUT_REDIRECT_URL = "connexion"

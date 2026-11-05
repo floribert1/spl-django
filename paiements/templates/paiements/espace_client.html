@@ -1,0 +1,66 @@
+{% extends "paiements/base.html" %}
+{% block titre %}Mon espace{% endblock %}
+{% block contenu %}
+<h1 class="h4 mb-3">Bonjour {{ client.prenom|default:client.username }} {{ client.nom }}</h1>
+
+<div class="row g-3 mb-4">
+  {% for compte in comptes %}
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="card carte p-3">
+      <div class="text-muted small">Compte {{ compte.numero }}</div>
+      <div class="solde">{{ compte.solde|floatformat:2 }} €</div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12"><div class="alert alert-warning">Aucun compte. Contactez l'administrateur.</div></div>
+  {% endfor %}
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-4">
+    <div class="card carte p-3">
+      <h2 class="h5">Effectuer un paiement</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% for champ in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+            {{ champ }}
+            {% for erreur in champ.errors %}<div class="text-danger small">{{ erreur }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="btn btn-primary w-100"><i class="bi bi-send"></i> Payer</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-8">
+    <div class="card carte p-3">
+      <h2 class="h5">Mes paiements</h2>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead><tr><th>N°</th><th>Date</th><th>Compte</th><th>Service</th><th class="text-end">Montant</th><th></th></tr></thead>
+          <tbody>
+          {% for p in paiements %}
+            <tr>
+              <td>{{ p.numero }}</td>
+              <td class="text-nowrap">{{ p.date|date:"d/m/Y H:i" }}</td>
+              <td>{{ p.compte.numero }}</td>
+              <td>{{ p.service }}</td>
+              <td class="text-end text-nowrap">{{ p.montant|floatformat:2 }} €</td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary text-nowrap" href="{% url 'ticket_pdf' p.pk %}">
+                  <i class="bi bi-file-earmark-pdf"></i> Ticket PDF
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-muted text-center">Aucun paiement pour l'instant.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
