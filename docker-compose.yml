@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    container_name: spl-django
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: "change-moi-cle-secrete-locale-tres-longue-123456"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1"
+    volumes:
+      - spl_data:/app/data   # la base SQLite est conservée entre deux redémarrages
+
+volumes:
+  spl_data:
