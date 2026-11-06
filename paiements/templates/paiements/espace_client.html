@@ -12,8 +12,22 @@
     </div>
   </div>
   {% empty %}
-  <div class="col-12"><div class="alert alert-warning">Aucun compte. Contactez l'administrateur.</div></div>
+  <div class="col-12"><div class="alert alert-warning">Aucun compte pour l'instant : ouvrez-en un ci-contre.</div></div>
   {% endfor %}
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="card carte p-3 h-100 border border-primary border-opacity-25">
+      <div class="fw-semibold mb-2"><i class="bi bi-plus-circle"></i> Ouvrir un nouveau compte</div>
+      <form method="post" action="{% url 'ajouter_compte' %}" class="d-flex flex-wrap gap-2 align-items-end">
+        {% csrf_token %}
+        <div class="flex-grow-1">
+          <label class="form-label small mb-1" for="{{ compte_form.solde_initial.id_for_label }}">{{ compte_form.solde_initial.label }}</label>
+          {{ compte_form.solde_initial }}
+        </div>
+        <button class="btn btn-outline-primary">Ajouter</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <div class="row g-4">

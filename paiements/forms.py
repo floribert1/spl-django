@@ -15,3 +15,11 @@ class PaiementForm(forms.Form):
         self.fields["compte"].queryset = client.get_comptes()
         for champ in self.fields.values():
             champ.widget.attrs["class"] = "form-select" if isinstance(champ, forms.ModelChoiceField) else "form-control"
+
+
+class CompteForm(forms.Form):
+    solde_initial = forms.DecimalField(
+        max_digits=12, decimal_places=2, min_value=Decimal("0.00"), initial=Decimal("0.00"),
+        label="Dépôt initial (€)",
+        widget=forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
+    )

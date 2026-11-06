@@ -59,6 +59,14 @@ class Compte(models.Model):
     def get_solde(self) -> Decimal:
         return self.solde
 
+    @staticmethod
+    def generer_numero() -> str:
+        """Numéro unique du type FR003, FR004..."""
+        n = Compte.objects.count() + 1
+        while Compte.objects.filter(numero=f"FR{n:03d}").exists():
+            n += 1
+        return f"FR{n:03d}"
+
     # ----- Paiements -----
     @transaction.atomic
     def payer(self, montant, service: str) -> "Paiement":
@@ -120,6 +128,14 @@ class Client(Utilisateur):
 
     def get_comptes(self):
         return self.comptes.all()
+
+    def ouvrir_compte(self, solde_initial=0) -> Compte:
+        solde_initial = Decimal(str(solde_initial))
+        if solde_initial < 0:
+            raise ValueError("Le dépôt initial ne peut pas être négatif.")
+        compte = Compte(numero=Compte.generer_numero(), solde=solde_initial)
+        self.ajouter_compte(compte)
+        return compte
 
     def effectuer_paiement(self, compte: Compte, montant, service: str) -> Paiement:
         if compte.proprietaire_id != self.pk:

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from io import BytesIO
 
-from .forms import PaiementForm
+from .forms import CompteForm, PaiementForm
 from .models import Administrateur, Client, Paiement
 
 
@@ -49,7 +49,23 @@ def espace_client(request):
     paiements = Paiement.objects.filter(compte__proprietaire=client).select_related("compte")
     return render(request, "paiements/espace_client.html", {
         "client": client, "comptes": client.get_comptes(), "paiements": paiements, "form": form,
+        "compte_form": CompteForm(),
     })
+
+
+@login_required
+@require_POST
+def ajouter_compte(request):
+    if request.user.est_administrateur():
+        return HttpResponseForbidden("Réservé aux clients.")
+    client = _client(request)
+    form = CompteForm(request.POST)
+    if form.is_valid():
+        compte = client.ouvrir_compte(form.cleaned_data["solde_initial"])
+        messages.success(request, f"Compte {compte.numero} ouvert avec un solde de {compte.solde:.2f} €.")
+    else:
+        messages.error(request, "Dépôt initial invalide : il doit être positif ou nul.")
+    return redirect("espace_client")
 
 
 @login_required
